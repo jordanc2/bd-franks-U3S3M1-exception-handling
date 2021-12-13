@@ -1,8 +1,10 @@
 package com.frank;
 
 import com.frank.types.Bowler;
+import com.frank.types.NonNumericInputException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,14 +19,32 @@ public class ApplicationProgram {
 
        System.out.println("-".repeat(80) + "\n--- List of Bowlers ---");
 
-       for (Bowler aBowler : theBowlers) {
-           ShowBowler(aBowler);
+       try {
+           for (Bowler aBowler : theBowlers) {
+               ShowBowler(aBowler);
+           }
        }
-       System.out.println("-".repeat(80));
-       String response = "";
-       boolean shouldLoop = true;
-       Scanner theKeyBoard = new Scanner(System.in);
-       while(shouldLoop) {
+       catch (Exception e) {
+           System.out.println("Null Pointer Encountered");
+           System.out.println("The system message says: " + e.getMessage());
+           System.out.println("How we got to the exception ");
+           // printStackTrace() writes to standard error stream
+           // System.out writes to standard output stream (which is different from the error stream)
+           // BOTH are assigned to screen by Java
+           // Writing to both may cause unexpected/interleaved output lines
+//           e.printStackTrace();
+           System.out.println(Arrays.toString(e.getStackTrace())); // Fix to printStackTrace, sout-Arrays.toString-getStackTrace()
+           System.out.println("Execution continuing...");
+       }
+
+        System.out.println("-".repeat(80));
+        String response = "";
+        boolean shouldLoop = true;
+        Scanner theKeyBoard = new Scanner(System.in);
+
+
+
+        while (shouldLoop) {
             System.out.println("\nEnter the number of the Bowler you would like displayed");
             System.out.printf("Valid numbers are 1 thru %d\nYour choice: ", theBowlers.size());
             response = theKeyBoard.nextLine();
@@ -32,9 +52,19 @@ public class ApplicationProgram {
                 shouldLoop = false;
                 continue;
             }
-            int bowlerNumber = Integer.parseInt(response);
-            ShowBowler(theBowlers.get(bowlerNumber-1));
-        }
+
+            int bowlerNumber = Integer.parseInt(response); // defined outside the try block, so scope can be used in try block
+            // throw custom exception if the user enters non-numeric bowler number
+            try {
+                ShowBowler(theBowlers.get(bowlerNumber - 1));
+            }
+            catch (NumberFormatException e) {
+                throw new NonNumericInputException("Input value " + response + " was non-numeric");
+            }
+
+           }
+
+
 
         System.out.println("-".repeat(80));
 
@@ -55,7 +85,7 @@ public class ApplicationProgram {
         theBowlers.add(new Bowler("Fred Flintstone", new int[] {230, 260, 275}));
         theBowlers.add(new Bowler("Barney Rubble",   new int[] {120, 140, 190}));
         theBowlers.add(new Bowler("The Dude",        new int[] {260, 270, 290}));
-        theBowlers.add(new Bowler());
+//        theBowlers.add(new Bowler());
         theBowlers.add(new Bowler("Roy Munson",      new int[] {225, 285, 252}));
     }
 }
